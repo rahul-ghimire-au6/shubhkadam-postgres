@@ -12,14 +12,7 @@ const productSchema = {
     image_url2: { type: Sequelize.TEXT },
     image_url3: { type: Sequelize.TEXT },
     image_url4: { type: Sequelize.TEXT },
-    // details: [{
-    //     size: { type: Sequelize.TEXT, allowNull: false },
-    //     price:{type:Sequelize.TEXT,allowNull:false},
-    //     colors: [{
-    //         color: { type: Sequelize.TEXT, allowNull: false },
-    //         quantity: { type: Sequelize.TEXT, allowNull: false }
-    //     }]
-    // }],
+    basic_price:{type:Sequelize.TEXT,allowNull:false},
     inner_material: { type: Sequelize.TEXT },
     shoe_type: { type: Sequelize.TEXT },
     upper_material: { type: Sequelize.TEXT },

@@ -59,7 +59,6 @@ module.exports = {
                 const admin = await admins.findOne({ where: { token: adminToken } })
                 if (admin) {
                     let { style_code } = req.body
-
                     const product = await products.findAll({ where: { style_code } })
                     console.log(product.length)
                     if (product.length != 0) return res.send("stylecode is already equipped")
@@ -129,7 +128,7 @@ module.exports = {
                 }
             } catch (err) {
                 if (err == "Validation error") return res.send("stylecode should be unique")
-                // console.log(err.message)
+                console.log(err.message)
                 return res.send("serverError")
             }
 
@@ -142,9 +141,10 @@ module.exports = {
                     const { style_code } = req.body
                     const productpd = req.body
                     const product = await products.findOne({ where: { style_code: style_code } })
-                    productpd.product_id = product.dataValues.id
                     if (product.length == 0) return res.send("product with this style code not found")
+
                     else {
+                        productpd.product_id = product.dataValues.id
                         const product_size_detail = await productsPD.create(productpd)
                         product_size_detail.save()
                         res.json(product_size_detail)
@@ -162,16 +162,18 @@ module.exports = {
                 const adminToken = req.header("Authorization")
                 const admin = await admins.findOne({ where: { token: adminToken } })
                 if (admin) {
-                    const { product_detail_id } = req.params
+                    const { size } = req.params
                     const value = req.body
-                    value.product_sizeID = product_detail_id
-                    const productDetails = await productsPD.findOne({ where: { id: product_detail_id } })
+                   
+                    const productDetails = await productsPD.findOne({ where: { size: size } })
+                    
                     if (productDetails) {
+                        value.product_sizeID = productDetails.id
                         const product = await productsColorandQuantity.create(value)
                         product.save()
                         res.json(product)
                     }
-                    else return res.send("size doesnt exist for this particular product")
+                    else return res.send("")
                 }
                 else return res.send("kindly login first")
             }
