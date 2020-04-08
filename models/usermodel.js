@@ -22,7 +22,9 @@ class User extends Model {
     };
     static async find_by_email(email) {
         try {
-            let temp1 = await User.findOne({ email: email });
+            let temp1 = await User.findOne({ 
+                where:{email}
+             });
             if (!temp1) {
                 return "Invalid Credentials";
             }
@@ -51,7 +53,8 @@ class User extends Model {
     };
     static async nullifyToken(token) {
         try {
-            const user = await User.findOne({ token: token })
+            const user = await User.findOne({ 
+                where:{token} })
             user.token = null;
             user.save()
             return user
@@ -62,7 +65,14 @@ class User extends Model {
     };
     static async find_user_by_token(token) {
         try {
-            const user = await User.findOne({ token: token })
+            console.log('inside user model token')
+            console.log(token)
+            const user = await User.findOne({ 
+                where:{
+                    token
+                }})
+            console.log('inside user model')
+            console.log(user)
             user.verified = true;
             user.save()
             return user

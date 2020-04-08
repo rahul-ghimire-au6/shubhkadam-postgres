@@ -12,7 +12,10 @@ module.exports = {
         },
         async verify_user_email(req, res) {
             try {
+                console.log(req.params.token)
                 let temp = req.params.token
+                console.log(temp)
+                console.log('look up')
                 let user1 = await users.find_user_by_token(temp)
                 await res.json(user1)
             }
