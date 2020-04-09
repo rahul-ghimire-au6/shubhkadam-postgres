@@ -26,7 +26,7 @@ module.exports = {
          let reviewArray = []
          try {
             const product = await products.findOne({ where: { id: productId } })
-            const user_review = await reviews.findOne({ product_id: productId })
+            const user_review = await reviews.findOne({ where:{product_id: productId} })
             if (user_review) {
                for (let i = 0; i < user_review.length; i++) {
                   const productReviewObj = {
