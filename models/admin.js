@@ -22,7 +22,7 @@ class Admin extends Model {
       }
       static async check_email_and_password(email, password) {
         try {
-          const admin = await Admin.findOne({ email: email,password:password });
+          const admin = await Admin.findOne({where:{ email: email,password:password }});
           if (!admin) throw new Error("Invalid Credentials");
           return admin;
         } catch (err) {
@@ -32,7 +32,7 @@ class Admin extends Model {
       }
     static async nullify_admin_token(token) {
         try {
-            const admin = await Admin.findOne({ token: token })
+            const admin = await Admin.findOne({where:{ token: token }})
             admin.token = null;
             admin.save()
             return admin

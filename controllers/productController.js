@@ -12,7 +12,7 @@ module.exports = {
       async products_view(req, res) {
          const { gender } = req.params
          try {
-            const all_products = await products.findAll({ gender: gender })
+            const all_products = await products.findAll({where:{ gender: gender}})
             const productDetail = await productsPD.findAll()
             await res.json(all_products)
          }
@@ -48,11 +48,11 @@ module.exports = {
       //--------------to view the cart page--------------
       async cartPage(req, res) {
          const { userId } = req.params
-         const userCart = await carts.findAll({ user_id: userId })
+         const userCart = await carts.findAll({where:{ user_id: userId }})
          let totalPrice = 0
          let cartArray = []
          for (i = 0; i < userCart.length; i++) {
-            const productDetail = await products.findOne({ id: userCart[i].product_id })
+            const productDetail = await products.findOne({where:{ id: userCart[i].product_id} })
             totalPrice = (userCart[i].price) + totalPrice
             newobj = {
                num: i + 1,
@@ -71,23 +71,23 @@ module.exports = {
             try {
                const { value, size } = req.body
                if (value == "ascending_date") {
-                  const all_products = await products.findAll({ order: sequelize.literal('id ASC') })
+                  const all_products = await products.findAll({where:{ order: sequelize.literal('id ASC')} })
                   res.send(all_products)
                }
                else if (value == "descending_date") {
-                  const all_products = await products.findAll({ order: sequelize.literal('id DESC') })
+                  const all_products = await products.findAll({where:{ order: sequelize.literal('id DESC')} })
                   res.send(all_products)
                }
                else if (value == "high_price") {
-                  const all_products = await products.findAll({ order: sequelize.literal('basic_price DESC') })
+                  const all_products = await products.findAll({where:{ order: sequelize.literal('basic_price DESC') }})
                   res.send(all_products)
                }
                else if (value == "low_price") {
-                  const all_products = await products.findAll({ order: sequelize.literal('basic_price ASC') })
+                  const all_products = await products.findAll({where:{ order: sequelize.literal('basic_price ASC') }})
                   res.send(all_products)
                }
                else if (size) {
-                  const all_products = await products.findAll({ "details.size": size })
+                  const all_products = await products.findAll({where:{ "details.size": size} })
                   if (all_products.length == 0) return res.send(`product of size ${size} is not available right now..come again later `)
                   res.send(all_products)
                }
@@ -127,7 +127,7 @@ module.exports = {
             const userToken = req.header("Authorization")
             const { productId } = req.params
             const user = await users.find_user_by_token(userToken)
-            const product = await products.findOne({ _id: productId })
+            const product = await products.findOne({where:{ _id: productId }})
             let count1 = 0
             let count2 = 0
             let count3 = 0

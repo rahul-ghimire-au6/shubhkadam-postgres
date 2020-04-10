@@ -65,14 +65,10 @@ class User extends Model {
     };
     static async find_user_by_token(token) {
         try {
-            console.log('inside user model token')
-            console.log(token)
             const user = await User.findOne({ 
                 where:{
                     token
                 }})
-            console.log('inside user model')
-            console.log(user)
             user.verified = true;
             user.save()
             return user
@@ -84,8 +80,6 @@ class User extends Model {
     async generateToken() {
         try {
             const user = this
-            // SECRET_KEY = `${user.email}-${new Date(user.createdAt).getTime()}`
-            // console.log(SECRET_KEY)
             const token = await sign({ id: user._id }, SECRET_KEY, {
                 expiresIn: "30d"
             })
