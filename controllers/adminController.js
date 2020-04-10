@@ -22,10 +22,8 @@ module.exports = {
                     //////////////////////end
                 }
                 catch (err) {
-                    if (err.code === 11000) {
-                        if (err.keyValue.hasOwnProperty('email')) {
-                            return res.status(403).send(`Email already occupied`);
-                        }
+                    if (err.fields.hasOwnProperty("email")) {
+                        return res.status(403).send(`Email already occupied`);
                     }
                     if (err.name === "ValidationError")
                         return res.status(400).send(`Validation Error: ${err.message}`);
@@ -49,14 +47,13 @@ module.exports = {
             }
             catch (err) {
                 console.log(err.message)
-                if (err.message == "Invalid Credentials") return res.status(400).send("Invalid Credentials")
+                if (err.message == "Incorrect Credentials") return res.status(400).send("Incorrect Credentials")
                 return res.send("ServerError")
             }
         },
         async add_product(req, res) {
             try {
-                const adminToken = req.header("Authorization")
-                const admin = await admins.findOne({ where: { token: adminToken } })
+                const admin = req.admin
                 if (admin) {
                     let { style_code } = req.body
                     const product = await products.findAll({ where: { style_code } })
@@ -135,8 +132,7 @@ module.exports = {
         },
         async add_product_precise_details(req, res) {
             try {
-                const adminToken = req.header("Authorization")
-                const admin = await admins.findOne({ where: { token: adminToken } })
+              const admin = req.admin
                 if (admin) {
                     const { style_code } = req.body
                     const productpd = req.body
@@ -159,16 +155,15 @@ module.exports = {
         },
         async add_products_clr_quantity(req, res) {
             try {
-                const adminToken = req.header("Authorization")
-                const admin = await admins.findOne({ where: { token: adminToken } })
+                const admin =req.admin
                 if (admin) {
-                    const { size } = req.params
-                    const value = req.body
-                   
-                    const productDetails = await productsPD.findOne({ where: { size: size } })
-                    
+                    const { sizeID } = req.params
+                    console.log(sizeID)
+                    const value = req.body                  
+                    const productDetails = await productsPD.findOne({ where: { id:sizeID} })
                     if (productDetails) {
                         value.product_sizeID = productDetails.id
+                        value.product_id=productDetails.product_id
                         const product = await productsColorandQuantity.create(value)
                         product.save()
                         res.json(product)

@@ -2,14 +2,10 @@ const users = require("../models/usermodel")
 const { verify } = require("jsonwebtoken")
 const email1 = require('../utils/nodeMailer')
 const { validationResult } = require("express-validator")
+const authy = require('authy')(process.env.authy_api_key);
+let authy_user_id = undefined
 module.exports = {
     get: {
-        async register_user(req, res) {
-            res.send('ok')
-        },
-        async login_user(req, res) {
-            res.send('ok')
-        },
         async verify_user_email(req, res) {
             try {
                 console.log(req.params.token)
@@ -34,15 +30,15 @@ module.exports = {
                 if (!email || !password)
                     return res.status(400).send("Incorrect Credentials")
                 const user = await users.find_by_email_and_password(email, password)
-                //  if(user.verified===false){
-                //     return res.json({"message":"Please verify your email first"})
-                //  }else{
+                 if(user.verified_email===false){
+                    return res.json({"message":"Please verify your email first"})
+                 }else{
                 const accesToken = await user.generateToken()
                 res.status(201).json({
                     statusCode: 201,
                     token: accesToken
                 })
-                //  }
+                 }
             }
             catch (err) {
                 console.log(err.message)
@@ -61,7 +57,6 @@ module.exports = {
                 try {
                     let user = req.body
                     const { email, password, name, phoneNo } = user
-                    console.log(user)
                     if (!email || !password || !name || !phoneNo)
 
                         return res.status(400).send("ValidationError")
@@ -76,11 +71,25 @@ module.exports = {
                          <p>Thank you!!!!</p>`;
 
                     email1(email, subject, html)          //function to send email to the user
-                    res.send(NewUser)
+                                  // otp sms
+
+               authy.register_user(email, phoneNo, '+91', function (err, res) {
+                if (err) { console.log(err) }
+                console.log(res)
+                authy_user_id = res.user.id
+                NewUser.otp_id = authy_user_id
+                NewUser.save()
+                authy.request_sms(authy_user_id, true, (err, res, ) => {
+                   if (err) {
+                      console.log(err)
+                   }
+                });
+             });
+             res.status(201).json({ statusCode: 201, NewUser })
 
                 }
                 catch (err) {
-                    // console.log(err)
+                    console.log(err)
                     if (err.fields.hasOwnProperty("email")) {
                         return res.status(403).send(`Email already occupied`);
                     }
@@ -100,11 +109,11 @@ module.exports = {
             try {
                 let { email } = req.body
                 const user = await users.find_by_email(email)
-                console.log(user)
-                // if (user.dataValues.verified === false) {
-                //     return res.json({ "message": "please verify your email first" })
-                // }
-                // else {
+                
+                if (user.dataValues.verified_email === false) {
+                    return res.json({ "message": "please verify your email first" })
+                }
+                else {
                     const resetToken = await users.generate_reset_token(user)
                     let subject = `Password Reset`
                     let html = `<h2>ShubhKadam.com</h2>
@@ -124,15 +133,17 @@ module.exports = {
                          console.log(user.dataValues.email)
                     email1(user.dataValues.email, subject, html)
                     res.status(200).json({ statuscode: 200, message: `We have send a reset password email to ${user.dataValues.email}. Please click the reset password link to set a new password.` })
-                // }
+                }
 
             } catch (err) {
+                if(err.message==="email not found") return res.send(err.message)
                 console.log(err.message)
                 res.status(500).send("server error")
             }
         },
         //----------------------------------------------------------------------------end
     },
+    
     //----------------------------------------------------------------------------start of put request
     put: {
         async forgot_password(req, res) {
@@ -179,7 +190,33 @@ module.exports = {
                 console.log(err.message)
                 res.status(500).send("server error")
             }
-        }
+        },
+        async deactivate_account(req, res) {
+            try {
+              const {userToken} = req.params
+               const user = await users.delete_user_by_token(userToken)
+               if (user.isthirdparty === false) {
+                  let subject = `Account Deactivation`
+                  let html = `<h2>ShubhKadam.com</h2>
+                           <h3>Dear ${user.name}, Seems like you Deactivated your Account for ShubhKadam.com.
+                            We Hope To See You Again.</h3>
+                           `;
+                  email1(user.email, subject, html)
+                  return res.json({ success: true, "msg": "thanks for choosing shubhkadam hope we will see you again" })
+               }
+               else {
+                  throw new Error("this feature is not available for third party signedin users")
+               }
+            } catch (err) {
+               if (err.message === 'this feature is not available for third party signedin users') {
+                  return res.json({ success: false, "msg": "this service is only available for third party signedin in users" })
+               }
+               else {
+                  console.log(err.message)
+                  res.status(500).send("server error")
+               }   
+            }
+         }
         //----------------------------------------------------------------------------end
     }
 }

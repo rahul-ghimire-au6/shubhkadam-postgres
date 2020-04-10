@@ -2,7 +2,6 @@ const { get, post, put, delete1 } = require("../controllers/userController")
 const { Router } = require("express")
 const router = Router()
 const { check } = require("express-validator")
-
 //-------------------------------------------------------Get Request Route
 router.get("/user/verify/:token", get.verify_user_email)
 
@@ -23,6 +22,7 @@ router.put("/user/forgot_password/:resetToken", [
 ], put.forgot_password)
 //-------------------------------------------------------Delete Request Route
 router.delete("/user/logout/:userToken", delete1.logout_user)
+router.delete("/user/deactivate/:userToken",delete1.deactivate_account)
 
 
 

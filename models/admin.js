@@ -22,8 +22,11 @@ class Admin extends Model {
       }
       static async check_email_and_password(email, password) {
         try {
-          const admin = await Admin.findOne({where:{ email: email,password:password }});
-          if (!admin) throw new Error("Invalid Credentials");
+          const admin = await Admin.findOne({where:{ email: email }});
+          console.log(admin)
+          if (!admin) throw new Error("Icorrect Credentials");
+          const isMatched = await compare(password, admin.password);
+          if (!isMatched) throw new Error("Incorrect Credentials");
           return admin;
         } catch (err) {
           err.name = 'AuthError';
