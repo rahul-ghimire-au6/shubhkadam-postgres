@@ -7,6 +7,7 @@ const passport=require('passport')
 const { Strategy: GoogleStrategy } = require("passport-google-oauth20");
 //require facebook strategy
 const { Strategy: FacebookStrategy } = require("passport-facebook");
+const users=require('../models/usermodel')
 
 router.use(passport.initialize())
 passport.serializeUser((user,done)=>{
