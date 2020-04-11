@@ -4,6 +4,9 @@ const app = require("./app")
 
 
 
+app.get('/',(req,res)=>{
+    res.json({"msg":"Welcome to shubhkadam"})
+})
 
 
 

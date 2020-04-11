@@ -17,7 +17,7 @@ passport.serializeUser((user,done)=>{
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: `localhost:5555/google/redirect`
+    callbackURL: `http://shubh-kadam-psql.herokuapp.com/google/redirect`
   },
   (accessToken, refreshToken, profile,done)=>{
     console.log(accessToken)
@@ -56,7 +56,7 @@ passport.use(new GoogleStrategy({
 passport.use(new FacebookStrategy({
     clientID: process.env.FACEBOOK_APP_API,
     clientSecret: process.env.FACEBOOK_APP_SECRET,
-    callbackURL: `localhost:5555/facebook/redirect`
+    callbackURL: `http://shubh-kadam-psql.herokuapp.com/facebook/redirect`
   },
   (accessToken, refreshToken, profile,done)=>{
     console.log(accessToken)
@@ -100,7 +100,7 @@ router.get("/google",passport.authenticate("google", {
 router.get("/google/redirect",
 passport.authenticate("google" ,
 {
-  failureRedirect: "localhost:5555/user/register"
+  failureRedirect: "http://shubh-kadam-psql.herokuapp.com/user/register"
 }
 ),
 (req,res)=>{
@@ -113,7 +113,7 @@ router.get("/facebook",passport.authenticate("facebook"));
 router.get("/facebook/redirect",
 passport.authenticate("facebook",
 {
-   failureRedirect: "localhost:5555/user/register"
+   failureRedirect: "http://shubh-kadam-psql.herokuapp.com/user/register"
  }
 ),
 (req,res)=>{
