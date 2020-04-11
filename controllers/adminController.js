@@ -7,7 +7,7 @@ const fs = require('fs')
 const cloudinary = require('../utils/cloudinary')
 module.exports = {
     post: {
-        //--------------------------------------------------------register user logic
+        //--------------------------------------------------------register admin logic
         async register_user(req, res) {
             {
 
@@ -32,7 +32,7 @@ module.exports = {
                 }
             }
         },
-        //----------------------------------------------------------------------------end
+        //-------------------------------------------------------login admin --------
         async login_admin(req, res) {
             try {
                 const { email, password } = req.body
@@ -51,6 +51,7 @@ module.exports = {
                 return res.send("ServerError")
             }
         },
+        // ---------------------add product by admin---------------------------
         async add_product(req, res) {
             try {
                 const admin = req.admin
@@ -130,6 +131,7 @@ module.exports = {
             }
 
         },
+        // ---------------------------------add product detail's  particular size and price
         async add_product_precise_details(req, res) {
             try {
               const admin = req.admin
@@ -153,6 +155,7 @@ module.exports = {
                 res.send("serverError")
             }
         },
+        // -------------------------------------add color of the product's particular size-
         async add_products_clr_quantity(req, res) {
             try {
                 const admin =req.admin
@@ -179,6 +182,7 @@ module.exports = {
         }
     },
     delete1: {
+        // ----------------logout admin--------------------------
         async logout_admin(req, res) {
             try {
                 token = req.params.adminToken

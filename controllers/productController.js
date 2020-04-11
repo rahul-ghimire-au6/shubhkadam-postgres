@@ -1,9 +1,18 @@
 const reviews = require("../models/review")
+const randomstring = require("randomstring")
 const products = require("../models/product")
+const payment1 = require("../models/payment")
 const productsPD = require("../models/productPreciseDetail")
 const productsColorandQuantity = require("../models/productClrBySize")
 const carts = require("../models/cart")
 const sequelize = require("sequelize")
+const Razorpay = require('razorpay')
+let val = undefined
+let { RAZOR_PAY_KEY_ID, RAZOR_PAY_SECRET } = process.env
+let instance = new Razorpay({
+   key_id: RAZOR_PAY_KEY_ID,
+   key_secret: RAZOR_PAY_SECRET
+})
 
 module.exports = {
    get1: {
@@ -189,6 +198,43 @@ module.exports = {
          catch (err) {
             console.log(err)
          }
+      },
+      async generate_order(req, res) {
+         try {
+            let user = req.user
+            let temp = req.body
+            let options = {
+               amount: temp.amount,  // amount in the smallest currency unit
+               currency: "INR",
+               receipt: randomstring.generate(7),
+               payment_capture: 1
+            };
+            instance.orders.create(options, (err, order) => {
+               if (err) throw err
+               val = order;
+            }).then(() => {
+               let paymentobj = {
+                  user_id: user.id,
+                  order_id: val.id,
+                  razor_payment_id:null,
+                  razor_signature:null
+               }
+               let yahoo = async ()=>{
+                  let order = await payment1.create(paymentobj)
+                  order.save()
+                  res.send(val)
+               }
+               yahoo()
+            })
+         } catch (err) {
+            console.log(err)
+         }
+      },
+      async razor_pay_success(req, res) {
+         console.log(req.body)
+         const {razorpay_payment_id,razorpay_order_id,razorpay_signature}=req.body
+        const payment= await payment1.findOne({order_id:razorpay_order_id})
+        payment.update({razor_payment_id:razorpay_payment_id,razor_signature:razorpay_signature})
       }
    }
 }

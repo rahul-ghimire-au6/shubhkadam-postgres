@@ -2,6 +2,124 @@ const { get, post, put, delete1 } = require("../controllers/userController")
 const { Router } = require("express")
 const router = Router()
 const { check } = require("express-validator")
+const passport=require('passport')
+//require google strategy
+const { Strategy: GoogleStrategy } = require("passport-google-oauth20");
+//require facebook strategy
+const { Strategy: FacebookStrategy } = require("passport-facebook");
+
+router.use(passport.initialize())
+passport.serializeUser((user,done)=>{
+    console.log(user)
+    done(null,user.id)
+})
+//google middleware
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: `localhost:5555/google/redirect`
+  },
+  (accessToken, refreshToken, profile,done)=>{
+    console.log(accessToken)
+    console.log(refreshToken)
+    console.log(profile)
+    //checking if user already exits or not
+    users.findOne({googleid:profile.id}).then(currentuser=>{
+        if(currentuser){ 
+            done(null,currentuser)
+        }else{
+            let token = async ()=>{
+                SECRET_KEY = `${profile.displayName}-${new Date(users.createdAt).getTime()}`
+                const token1 = await sign({ id: profile.id }, SECRET_KEY, {
+                    expiresIn: "1d"
+                })
+                new users({
+                    name:profile.displayName,
+                    googleid:profile.id,
+                    token:await token1,
+                    email:accessToken,
+                    password:'null',
+                    phoneNo:accessToken,
+                    resetToken:accessToken,
+                    verified_email:true,
+                    isthirdparty:true,
+                }).save().then((currentuser)=>{
+                done(null,currentuser)
+                })
+            }
+            token()
+        }
+    })
+  }
+));
+//facebook middleware
+passport.use(new FacebookStrategy({
+    clientID: process.env.FACEBOOK_APP_API,
+    clientSecret: process.env.FACEBOOK_APP_SECRET,
+    callbackURL: `localhost:5555/facebook/redirect`
+  },
+  (accessToken, refreshToken, profile,done)=>{
+    console.log(accessToken)
+    console.log(refreshToken)
+    console.log(profile)
+    //checking if user already exits or not
+    users.findOne({facebookid:profile.id}).then(currentuser=>{
+        if(currentuser){ 
+            done(null,currentuser)
+        }else{
+            let token = async ()=>{
+                SECRET_KEY = `${profile.displayName}-${new Date(users.createdAt).getTime()}`
+                const token1 = await sign({ id: profile.id }, SECRET_KEY, {
+                    expiresIn: "1d"
+                })
+                new users({
+                    name:profile.displayName,
+                    facebookid:profile.id,
+                    token:await token1,
+                    email:accessToken,
+                    password:'null',
+                    phoneNo:accessToken,
+                    resetToken:accessToken,
+                    verified_email:true,
+                    isthirdparty:true,
+                }).save().then((currentuser)=>{
+                done(null,currentuser)
+                })
+            }
+            token()
+        }
+    })
+  }
+));
+//----------------------------------------------------------google route
+router.get("/google",passport.authenticate("google", {
+    scope: ["profile", "email"]
+  }
+  ));
+//google redirect route
+router.get("/google/redirect",
+passport.authenticate("google" ,
+{
+  failureRedirect: "localhost:5555/user/register"
+}
+),
+(req,res)=>{
+res.send(req.user)    
+});
+
+//---------------------------------------------------------------facebook route
+router.get("/facebook",passport.authenticate("facebook"));
+//facebook redirect route
+router.get("/facebook/redirect",
+passport.authenticate("facebook",
+{
+   failureRedirect: "localhost:5555/user/register"
+ }
+),
+(req,res)=>{
+ res.send(req.user)    
+});
+
 //-------------------------------------------------------Get Request Route
 router.get("/user/verify/:token", get.verify_user_email)
 
