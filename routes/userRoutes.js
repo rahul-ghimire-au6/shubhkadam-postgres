@@ -1,3 +1,4 @@
+const randomstring=require('randomstring')
 const { get, post, put, delete1 } = require("../controllers/userController")
 const { Router } = require("express")
 const router = Router()
@@ -20,6 +21,7 @@ passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: `http://shubh-kadam-psql.herokuapp.com/google/redirect`
+    // callbackURL: `http://localhost:5555/google/redirect`
   },
   (accessToken, refreshToken, profile,done)=>{
     console.log(accessToken)
@@ -41,7 +43,10 @@ passport.use(new GoogleStrategy({
                     token:await token1,
                     email:accessToken,
                     password:'null',
-                    phoneNo:0,
+                    phoneNo:randomstring.generate({
+                        length: 6,
+                        charset: 'numeric'
+                      }),
                     resetToken:accessToken,
                     verified_email:true,
                     isthirdparty:true,
@@ -80,7 +85,10 @@ passport.use(new FacebookStrategy({
                     token:await token1,
                     email:accessToken,
                     password:'null',
-                    phoneNo:0,
+                    phoneNo:randomstring.generate({
+                        length: 6,
+                        charset: 'numeric'
+                      }),
                     resetToken:accessToken,
                     verified_email:true,
                     isthirdparty:true,
