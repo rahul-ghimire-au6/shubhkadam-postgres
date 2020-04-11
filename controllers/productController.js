@@ -19,9 +19,11 @@ module.exports = {
       // ------------------to view products---------------
       async products_view(req, res) {
          const { gender } = req.params
+         const {pageNo}=req.query
          try {
-            const all_products = await products.findAll({ where: { gender: gender } })
-            const productDetail = await productsPD.findAll()
+            offset = pageNo * 2
+            limit = 2
+            const all_products = await products.findAll({limit,offset, where: { gender: gender } })
             await res.json(all_products)
          }
          catch (err) {
@@ -83,7 +85,7 @@ module.exports = {
          let cartArray = []
          for (i = 0; i < userCart.length; i++) {
             const productDetail = await products.findOne({ where: { id: userCart[i].product_id } })
-            totalPrice = totalPrice+((userCart[i].price) * userCart[i].quantity)
+            totalPrice = totalPrice + ((userCart[i].price) * userCart[i].quantity)
             newobj = {
                num: i + 1,
                image: productDetail.image_url1,
@@ -216,10 +218,10 @@ module.exports = {
                let paymentobj = {
                   user_id: user.id,
                   order_id: val.id,
-                  razor_payment_id:null,
-                  razor_signature:null
+                  razor_payment_id: null,
+                  razor_signature: null
                }
-               let yahoo = async ()=>{
+               let yahoo = async () => {
                   let order = await payment1.create(paymentobj)
                   order.save()
                   res.send(val)
@@ -232,9 +234,9 @@ module.exports = {
       },
       async razor_pay_success(req, res) {
          console.log(req.body)
-         const {razorpay_payment_id,razorpay_order_id,razorpay_signature}=req.body
-        const payment= await payment1.findOne({order_id:razorpay_order_id})
-        payment.update({razor_payment_id:razorpay_payment_id,razor_signature:razorpay_signature})
+         const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body
+         const payment = await payment1.findOne({ order_id: razorpay_order_id })
+         payment.update({ razor_payment_id: razorpay_payment_id, razor_signature: razorpay_signature })
       }
    }
 }

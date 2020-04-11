@@ -24,7 +24,7 @@ class Admin extends Model {
         try {
           const admin = await Admin.findOne({where:{ email: email }});
           console.log(admin)
-          if (!admin) throw new Error("Icorrect Credentials");
+          if (!admin) throw new Error("Incorrect Credentials");
           const isMatched = await compare(password, admin.password);
           if (!isMatched) throw new Error("Incorrect Credentials");
           return admin;
