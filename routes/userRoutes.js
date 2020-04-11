@@ -8,6 +8,7 @@ const { Strategy: GoogleStrategy } = require("passport-google-oauth20");
 //require facebook strategy
 const { Strategy: FacebookStrategy } = require("passport-facebook");
 const users=require('../models/usermodel')
+const { sign } = require("jsonwebtoken")
 
 router.use(passport.initialize())
 passport.serializeUser((user,done)=>{
