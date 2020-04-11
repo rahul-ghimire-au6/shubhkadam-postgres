@@ -63,7 +63,7 @@ passport.use(new GoogleStrategy({
 passport.use(new FacebookStrategy({
     clientID: process.env.FACEBOOK_APP_API,
     clientSecret: process.env.FACEBOOK_APP_SECRET,
-    callbackURL: `http://shubh-kadam-psql.herokuapp.com/facebook/redirect`
+    callbackURL: `https://shubh-kadam-psql.herokuapp.com/facebook/redirect`
   },
   (accessToken, refreshToken, profile,done)=>{
     console.log(accessToken)
@@ -123,7 +123,7 @@ router.get("/facebook",passport.authenticate("facebook"));
 router.get("/facebook/redirect",
 passport.authenticate("facebook",
 {
-   failureRedirect: "http://shubh-kadam-psql.herokuapp.com/user/register"
+   failureRedirect: "https://shubh-kadam-psql.herokuapp.com/user/register"
  }
 ),
 (req,res)=>{
