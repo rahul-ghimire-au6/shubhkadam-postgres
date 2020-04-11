@@ -25,7 +25,7 @@ passport.use(new GoogleStrategy({
     console.log(refreshToken)
     console.log(profile)
     //checking if user already exits or not
-    users.findOne({googleid:profile.id}).then(currentuser=>{
+    users.findOne({where:{googleid:profile.id}}).then(currentuser=>{
         if(currentuser){ 
             done(null,currentuser)
         }else{
@@ -64,7 +64,7 @@ passport.use(new FacebookStrategy({
     console.log(refreshToken)
     console.log(profile)
     //checking if user already exits or not
-    users.findOne({facebookid:profile.id}).then(currentuser=>{
+    users.findOne({where:{facebookid:profile.id}}).then(currentuser=>{
         if(currentuser){ 
             done(null,currentuser)
         }else{
