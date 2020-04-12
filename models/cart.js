@@ -10,7 +10,7 @@ const cartSchema = {
      quantity: { type: Sequelize.NUMERIC },
       size: { type: Sequelize.NUMERIC },
        color: { type: Sequelize.TEXT },
-       price:{type:Sequelize.NUMERIC} 
+       price:{type:Sequelize.NUMERIC}
 }
 cart.init(cartSchema, {
     sequelize, tableName: "cart"

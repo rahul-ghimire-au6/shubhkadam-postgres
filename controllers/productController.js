@@ -7,6 +7,7 @@ const productsColorandQuantity = require("../models/productClrBySize")
 const carts = require("../models/cart")
 const sequelize = require("sequelize")
 const Razorpay = require('razorpay')
+const order_placed=require("../models/order_placed")
 let val = undefined
 let { RAZOR_PAY_KEY_ID, RAZOR_PAY_SECRET } = process.env
 let instance = new Razorpay({
@@ -16,6 +17,19 @@ let instance = new Razorpay({
 
 module.exports = {
    get1: {
+      async search_products(req,res){
+         try{
+         const {value} = req.body
+         console.log(value)
+         const all_products =await products.findAll({where:{[sequelize.Op.or]: [ { category:value}, {name:value },  { brand:value } ] }})
+         if(all_products.length==0) return res.json("no shoes found")
+         res.json(all_products)
+         }
+         catch(err){
+            console.log(err.message)
+            return res.json("Server Error")
+         }
+      },
       // ------------------to view products---------------
       async products_view(req, res) {
          const { gender } = req.params
@@ -80,6 +94,7 @@ module.exports = {
       //--------------to view the cart page--------------
       async cartPage(req, res) {
          const { userId } = req.params
+
          const userCart = await carts.findAll({ where: { user_id: userId } })
          let totalPrice = 0
          let cartArray = []
@@ -127,6 +142,36 @@ module.exports = {
       }
    },
    post1: {
+      // ----------------------------order place controller
+      async order_place(req,res){
+         try{
+         const user= req.user
+         const {Address}=req.body
+         const userCart = await carts.findAll({ where: { user_id: user.id } })
+         let totalPrice = 0
+         let orderArray = []
+         for (i = 0; i < userCart.length; i++) {
+            const productDetail = await products.findOne({ where: { id: userCart[i].product_id } })
+            totalPrice = totalPrice + ((userCart[i].price) * userCart[i].quantity)
+            newobj = {
+               num: i + 1,
+               image: productDetail.image_url1,
+               name: productDetail.name,
+               size: userCart[i].size,
+               quantity: userCart[i].quantity,
+               price: userCart[i].price,
+            }
+            orderArray.push(newobj)
+         }
+         const order = await order_placed.create({user_id:user.id,order_place:orderArray,Address:Address})
+         order.save()
+         await res.json({ products: orderArray,address:Address, totalPrice: totalPrice })
+      }
+      catch(err){
+         console.log(err.message)
+         res.json("serverError")
+      }
+      },
       // -----------------------------to post the review by users
       async post_reviews(req, res) {
          try {
