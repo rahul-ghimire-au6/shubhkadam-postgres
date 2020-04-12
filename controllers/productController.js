@@ -119,11 +119,6 @@ module.exports = {
                const all_products = await products.findAll({ where: { gender: gender }, order: sequelize.literal('basic_price ASC') })
                res.send(all_products)
             }
-            else if (size) {
-               const all_products = await products.findAll({ where: { "details.size": size } })
-               if (all_products.length == 0) return res.send(`product of size ${size} is not available right now..come again later `)
-               res.send(all_products)
-            }
          }
          catch (err) {
             console.log(err.message)
@@ -132,6 +127,7 @@ module.exports = {
       }
    },
    post1: {
+      // -----------------------------to post the review by users
       async post_reviews(req, res) {
          try {
             const { review, star } = req.body
@@ -152,6 +148,7 @@ module.exports = {
             res.send("server error")
          }
       },
+//  to add the cart by user
       async add_to_cart(req, res) {
          try {
             const { size, color, quantity } = req.body
@@ -201,6 +198,7 @@ module.exports = {
             console.log(err)
          }
       },
+      // to generate order and order Id
       async generate_order(req, res) {
          try {
             let user = req.user
@@ -232,6 +230,7 @@ module.exports = {
             console.log(err)
          }
       },
+      //  to pay the payment using razor pay
       async razor_pay_success(req, res) {
          console.log(req.body)
          const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body

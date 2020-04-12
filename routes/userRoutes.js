@@ -132,7 +132,7 @@ passport.authenticate("facebook",
 
 //-------------------------------------------------------Get Request Route
 router.get("/user/verify/:token", get.verify_user_email)
-
+router.post("/user/verifyotp/:userid",post.verify_phoneNo_otp)
 
 //-------------------------------------------------------Post Request Route
 router.post("/user/register", [

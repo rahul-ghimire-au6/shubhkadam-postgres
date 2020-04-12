@@ -139,7 +139,41 @@ module.exports = {
                 console.log(err.message)
                 res.status(500).send("server error")
             }
-        },
+        }, // verify phone no. otp---------------------------------------
+        async verify_phoneNo_otp(req, res) {
+           try {
+              const { userid } = req.params
+              const authy_token = req.body.token
+              const user = await users.findOne({where:{ id: userid }})
+              let temp=false;
+              authy.verify(user[0].otp_id, authy_token, (err,res) => {
+                 if(err){
+                    console.log(err)
+                    temp=false
+                 }
+                 else{
+                    console.log(res)
+                    if(res.success===true){
+                       temp=true;
+                    }
+                 }
+              });
+              setTimeout(() => {
+                    if(temp==true){
+                       user[0].verified_mobile=true
+                       user[0].save()
+                       res.status(200).json({statuscode: 200, 'message': 'Phone Number verified successfully'})
+                    }
+                    else{
+                       res.status(200).json({statuscode: 400, 'message': 'Phone Number Not verified successfully/Something went wrong'})
+                    }  
+                 }, 5000);
+           } catch (err) {
+              console.log(err.message)
+              res.send("ServerError")
+           }
+        }
+        //----------------------------------------------------------------------------end
         //----------------------------------------------------------------------------end
     },
 
