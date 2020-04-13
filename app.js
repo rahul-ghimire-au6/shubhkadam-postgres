@@ -16,9 +16,12 @@ const productRoute=require("./routes/productRoutes")
 
 app.use(
   cors({
-      origin:"*",                     //"http://127.0.0.1:5500/addproduct.html",
+      origin:"*",    
       allowedHeaders: ["Content-Type","Authorization"],
-      credentials: true
+      methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+      credentials: true,
+      // "preflightContinue": false,
+      // "optionsSuccessStatus": 204
   })
 );
 
