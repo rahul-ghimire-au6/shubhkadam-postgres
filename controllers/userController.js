@@ -78,11 +78,11 @@ module.exports = {
                         authy_user_id = res.user.id
                         NewUser.otp_id = authy_user_id
                         NewUser.save()
-                        // authy.request_sms(authy_user_id, true, (err, res, ) => {
-                        //     if (err) {
-                        //         console.log(err)
-                        //     }
-                        // });
+                        authy.request_sms(authy_user_id, true, (err, res, ) => {
+                            if (err) {
+                                console.log(err)
+                            }
+                        });
                     });
                     setTimeout(() => {
                         res.status(201).json({ statusCode: 201, NewUser })
