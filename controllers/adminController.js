@@ -1,11 +1,25 @@
 const admins = require("../models/admin")
 const products = require("../models/product")
+const user_orders = require("../models/order_placed")
 const productsPD = require("../models/productPreciseDetail")
 const productsColorandQuantity = require("../models/productClrBySize")
 const fs = require('fs')
 //requiring cloudinary
 const cloudinary = require('../utils/cloudinary')
 module.exports = {
+    get: {
+        async orders_from_users(req, res) {
+            try{
+          const admin=req.admin
+            const orders=await user_orders.findAll()
+            res.json(orders)
+            }
+            catch(err){
+                console.log(err.message)
+                res.json({"message":"serverError"})
+            }
+        }
+    },
     post: {
         //--------------------------------------------------------register admin logic
         async register_user(req, res) {
@@ -134,7 +148,7 @@ module.exports = {
         // ---------------------------------add product detail's  particular size and price
         async add_product_precise_details(req, res) {
             try {
-              const admin = req.admin
+                const admin = req.admin
                 if (admin) {
                     const { style_code } = req.body
                     const productpd = req.body
@@ -158,15 +172,15 @@ module.exports = {
         // -------------------------------------add color of the product's particular size-
         async add_products_clr_quantity(req, res) {
             try {
-                const admin =req.admin
+                const admin = req.admin
                 if (admin) {
                     const { sizeID } = req.params
                     console.log(sizeID)
-                    const value = req.body                  
-                    const productDetails = await productsPD.findOne({ where: { id:sizeID} })
+                    const value = req.body
+                    const productDetails = await productsPD.findOne({ where: { id: sizeID } })
                     if (productDetails) {
                         value.product_sizeID = productDetails.id
-                        value.product_id=productDetails.product_id
+                        value.product_id = productDetails.product_id
                         const product = await productsColorandQuantity.create(value)
                         product.save()
                         res.json(product)

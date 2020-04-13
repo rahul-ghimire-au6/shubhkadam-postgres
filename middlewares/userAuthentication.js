@@ -4,7 +4,6 @@ module.exports = async (req, res, next) => {
         if (req.header("Authorization")) {
             const userToken = req.header("Authorization")
             const user = await users.findOne({where:{token:userToken}})
-            console.log(user)
             if (user) {
                 if (user.verified_email == true) {
                     req.user = user

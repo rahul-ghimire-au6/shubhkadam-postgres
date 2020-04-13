@@ -8,12 +8,14 @@ router.get("/shoes/product/:productId",get1.product_details)
 router.get("/shoes/:gender",get1.products_view)
 router.get("/user/cart/:userId",get1.cartPage)
 router.get("/user/sortproduct/:gender",get1.sort_the_product)
+router.get("/cartproducts/delete/:cartId",authentication,get1.product_delete_from_cart)
 // ---------post route---------------------------
 router.post("/review/:productId",authentication,post1.post_reviews)
 router.post("/user/orders",authentication,post1.order_place)
 router.post("/user/addToCart/:productId",authentication,post1.add_to_cart)
 router.post("/create",authentication,post1.generate_order)
 router.post("/success",post1.razor_pay_success)
+
 
 
 module.exports=router
