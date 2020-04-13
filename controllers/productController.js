@@ -102,7 +102,7 @@ module.exports = {
             const productDetail = await products.findOne({ where: { id: userCart[i].product_id } })
             totalPrice = totalPrice + ((userCart[i].price) * userCart[i].quantity)
             newobj = {
-               num: i + 1,
+               cartId: userCart[i].id,
                image: productDetail.image_url1,
                name: productDetail.name,
                size: userCart[i].size,
