@@ -150,7 +150,7 @@ router.put("/user/forgot_password/:resetToken", [
 ], put.forgot_password)
 //-------------------------------------------------------Delete Request Route
 router.delete("/user/logout/:userToken", delete1.logout_user)
-router.delete("/user/deactivate/:userToken",delete1.deactivate_account)
+// router.delete("/user/deactivate/:userToken",delete1.deactivate_account)
 
 
 
