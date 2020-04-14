@@ -131,8 +131,10 @@ module.exports = {
                          <p>copy paste this link to your browser:- https://shubh-kadam-psql.herokuapp.com/user/forgot_password/${resetToken}
                          <p style="color:red;">If you did not forgot your password you can safely ignore this email.</p>
                          <p>Thank you for choosing ShubhKadam.com</p>`;
-                    console.log(user.dataValues.email)
                     email1(user.dataValues.email, subject, html)
+                    user.resetToken=resetToken
+                    await user.update({resetToken:resetToken})
+                   await user.save()
                     res.status(200).json({ statuscode: 200, message: `We have send a reset password email to ${user.dataValues.email}. Please click the reset password link to set a new password.` })
                 }
 
@@ -188,6 +190,7 @@ module.exports = {
                 if (!errors.isEmpty()) {
                     return res.status(422).json({ errors: errors.array() })
                 }
+                
                 const { resetToken } = req.params
                 const { newpassword, cpassword } = req.body
                 if (newpassword !== cpassword) return res.send("Password doesnt match")
@@ -195,11 +198,8 @@ module.exports = {
                     const decoded = await verify(resetToken, process.env.secretkey)
                     if (decoded) {
                         const user = await users.findOne({ resetToken: resetToken })
-                        // user.dataValues.password = newpassword
-
                         user.update({ password: newpassword })
                         console.log(user)
-
                         res.send("password successfully changed")
                     }
                 }

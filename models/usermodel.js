@@ -37,7 +37,7 @@ class User extends Model {
     static async generate_reset_token(user1) {
         try {
             const user = user1
-
+console.log(user)
             const token = await sign({ id: user._id }, process.env.secretkey, {
                 expiresIn: "5m"
             })
@@ -70,6 +70,7 @@ class User extends Model {
                 }
             })
             user.verified_email = true;
+            user.update({verified_email:true})
             user.save()
             return user
         }
