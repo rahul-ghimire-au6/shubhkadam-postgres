@@ -7,6 +7,7 @@ module.exports = async (req, res, next) => {
             if (admin){
                 req.admin = admin
                }
+               else return res.send("kindly login first")  
         }
         else return res.send("kindly login first")
         next();
